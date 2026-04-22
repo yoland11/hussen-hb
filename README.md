@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# حسين بيرام
 
-## Getting Started
+نظام إدارة حجوزات جلسات تصوير أونلاين مبني باستخدام:
 
-First, run the development server:
+- Next.js 16
+- Supabase
+- Vercel
+
+## الميزات
+
+- صفحة دخول للإدارة عبر PIN فقط
+- حفظ الـ PIN كـ hash داخل البيئة
+- جلسات آمنة عبر `HttpOnly cookies`
+- حماية لوحة التحكم `dashboard`
+- CRUD كامل للحجوزات
+- بحث وفلترة
+- حفظ البيانات داخل Supabase بدل `localStorage`
+- معاينة وطباعة ومشاركة الفاتورة
+- واجهة عربية محافظة على الهوية البصرية الأصلية
+
+## تشغيل المشروع محلياً
+
+1. انسخ ملف البيئة:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. أنشئ hash للـ PIN:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run hash:pin -- 1234
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. ضع قيمة الـ hash داخل `ADMIN_PIN_HASH` في `.env.local`.
 
-## Learn More
+4. نفّذ ملف [schema.sql](/Users/yoland/Desktop/حسين بيرام /schema.sql) داخل مشروع Supabase.
 
-To learn more about Next.js, take a look at the following resources:
+5. شغّل المشروع:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## متغيرات البيئة
 
-## Deploy on Vercel
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ADMIN_PIN_HASH`
+- `AUTH_SECRET`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## النشر على Vercel
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. أنشئ مشروعاً جديداً على Vercel أو اربط هذا المشروع الحالي.
+2. أضف نفس متغيرات البيئة في إعدادات المشروع على Vercel.
+3. نفّذ `schema.sql` في Supabase.
+4. انشر المشروع.
+
+## هيكل المشروع
+
+- `src/app` صفحات Next.js وواجهات الـ API
+- `src/components` مكونات الواجهة
+- `src/lib` طبقة الأعمال: auth, supabase, bookings
+- `schema.sql` إنشاء جدول الحجوزات
+- `env.example` قالب البيئة
+- `scripts/hash-pin.mjs` توليد hash للـ PIN
