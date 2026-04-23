@@ -32,31 +32,38 @@ export async function upsertNotificationSubscription(
   userAgent = "",
 ) {
   const supabase = getSupabaseAdmin();
-  const { error } = await supabase.from("notification_subscriptions").upsert(
-    {
-      endpoint: subscription.endpoint,
-      keys_p256dh: subscription.keys.p256dh,
-      keys_auth: subscription.keys.auth,
-      user_agent: userAgent,
-    },
-    {
+
+  const payload = {
+    endpoint: subscription.endpoint,
+    keys_p256dh: subscription.keys.p256dh,
+    keys_auth: subscription.keys.auth,
+    user_agent: userAgent,
+  };
+
+  console.log("Saving notification subscription:", payload);
+
+  const { error } = await supabase
+    .from("notification_subscriptions")
+    .upsert(payload, {
       onConflict: "endpoint",
-    },
-  );
+    });
 
   if (error) {
+    console.error("notification_subscriptions upsert error:", error);
     throw new Error(error.message);
   }
 }
 
 export async function removeNotificationSubscription(endpoint: string) {
   const supabase = getSupabaseAdmin();
+
   const { error } = await supabase
     .from("notification_subscriptions")
     .delete()
     .eq("endpoint", endpoint);
 
   if (error) {
+    console.error("notification_subscriptions delete error:", error);
     throw new Error(error.message);
   }
 }
@@ -83,6 +90,7 @@ export async function notifyAdminsAboutNewBooking(booking: Booking) {
     .select("endpoint, keys_p256dh, keys_auth");
 
   if (error) {
+    console.error("notification_subscriptions select error:", error);
     throw new Error(error.message);
   }
 
@@ -102,6 +110,8 @@ export async function notifyAdminsAboutNewBooking(booking: Booking) {
       try {
         await pushClient.sendNotification(mapStoredSubscription(row), payload);
       } catch (error) {
+        console.error("sendNotification error:", error);
+
         if (
           error &&
           typeof error === "object" &&

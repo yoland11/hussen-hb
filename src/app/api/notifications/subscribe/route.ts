@@ -28,6 +28,14 @@ export async function POST(request: Request) {
   try {
     await assertAdminSession();
 
+    console.log("hasPushConfig:", hasPushConfig());
+    console.log(
+      "NEXT_PUBLIC_VAPID_PUBLIC_KEY exists:",
+      !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    );
+    console.log("VAPID_PRIVATE_KEY exists:", !!process.env.VAPID_PRIVATE_KEY);
+    console.log("VAPID_SUBJECT exists:", !!process.env.VAPID_SUBJECT);
+
     if (!hasPushConfig()) {
       return missingPushConfigResponse();
     }
@@ -45,6 +53,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    console.error("POST /api/notifications/subscribe error:", error);
+
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ message: "غير مصرح" }, { status: 401 });
     }
@@ -57,7 +67,12 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { message: "تعذر تفعيل الإشعارات حالياً." },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "تعذر تفعيل الإشعارات حالياً.",
+      },
       { status: 500 },
     );
   }
@@ -77,6 +92,8 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    console.error("DELETE /api/notifications/subscribe error:", error);
+
     if (error instanceof UnauthorizedError) {
       return NextResponse.json({ message: "غير مصرح" }, { status: 401 });
     }
@@ -89,7 +106,12 @@ export async function DELETE(request: Request) {
     }
 
     return NextResponse.json(
-      { message: "تعذر إيقاف الإشعارات حالياً." },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "تعذر إيقاف الإشعارات حالياً.",
+      },
       { status: 500 },
     );
   }
