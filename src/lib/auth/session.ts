@@ -3,54 +3,23 @@ import { SignJWT, jwtVerify } from "jose";
 import { getAuthSecret } from "@/lib/env";
 
 export const SESSION_COOKIE_NAME = "hb_admin_session";
-export const SESSION_IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 
-const REMEMBERED_SESSION_MAX_AGE = 60 * 60 * 24 * 30;
+const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 
-type AdminSessionPayload = {
-  role: "admin";
-  rememberDevice: boolean;
-  loginAt: number;
+export const sessionCookieOptions = {
+  httpOnly: true,
+  maxAge: SESSION_MAX_AGE,
+  path: "/",
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production",
 };
 
-function getSigningKey() {
-  return new TextEncoder().encode(getAuthSecret());
-}
-
-export function getSessionCookieOptions(rememberDevice: boolean) {
-  return {
-    httpOnly: true,
-    maxAge: rememberDevice ? REMEMBERED_SESSION_MAX_AGE : undefined,
-    path: "/",
-    sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
-  };
-}
-
-export function getExpiredSessionCookieOptions() {
-  return {
-    ...getSessionCookieOptions(true),
-    expires: new Date(0),
-    maxAge: 0,
-  };
-}
-
-export async function createAdminSessionToken({
-  rememberDevice,
-}: {
-  rememberDevice: boolean;
-}) {
-  return new SignJWT({
-    role: "admin",
-    rememberDevice,
-    loginAt: Date.now(),
-  } satisfies AdminSessionPayload)
+export async function createAdminSessionToken() {
+  return new SignJWT({ role: "admin" })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(
-      rememberDevice ? `${REMEMBERED_SESSION_MAX_AGE}s` : "12h",
-    )
-    .sign(getSigningKey());
+    .setExpirationTime(`${SESSION_MAX_AGE}s`)
+    .sign(new TextEncoder().encode(getAuthSecret()));
 }
 
 export async function verifyAdminSessionToken(token?: string | null) {
@@ -59,28 +28,13 @@ export async function verifyAdminSessionToken(token?: string | null) {
   }
 
   try {
-    const { payload } = await jwtVerify(token, getSigningKey());
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(getAuthSecret()),
+    );
 
     return payload.role === "admin";
   } catch {
     return false;
-  }
-}
-
-export async function readAdminSession(token?: string | null) {
-  if (!token) {
-    return null;
-  }
-
-  try {
-    const { payload } = await jwtVerify(token, getSigningKey());
-
-    if (payload.role !== "admin") {
-      return null;
-    }
-
-    return payload as unknown as AdminSessionPayload;
-  } catch {
-    return null;
   }
 }

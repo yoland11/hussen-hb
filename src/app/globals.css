@@ -1641,27 +1641,12 @@ textarea {
   font-weight: 700;
 }
 
-.inline-success {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(231, 255, 239, 0.94);
-  border: 1px solid rgba(22, 163, 74, 0.16);
-  color: #166534;
-  font-size: 13px;
-  font-weight: 700;
-}
-
 .inline-error.wide {
   margin-bottom: 12px;
 }
 
-.inline-success.wide {
-  margin-bottom: 12px;
-}
-
 .login-card {
-  padding: 1.6rem;
+  padding: 1.5rem;
 }
 
 .login-badge {
@@ -1694,177 +1679,6 @@ textarea {
 .login-form {
   display: grid;
   gap: 12px;
-}
-
-.login-field-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.login-field-hint {
-  color: rgba(95, 59, 31, 0.72);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.pin-input-shell {
-  position: relative;
-}
-
-.pin-slot-group {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 10px;
-  direction: ltr;
-}
-
-.pin-slot-group.shake {
-  animation: pinShake 0.45s ease;
-}
-
-.pin-slot {
-  min-height: 62px;
-  display: grid;
-  place-items: center;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 212, 168, 0.9);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 246, 234, 0.96)),
-    rgba(255, 255, 255, 0.9);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 12px 26px rgba(96, 52, 8, 0.08);
-  color: var(--primary-deep);
-  font-size: 24px;
-  font-weight: 800;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.pin-slot.filled {
-  border-color: rgba(232, 85, 0, 0.42);
-}
-
-.pin-slot.active {
-  transform: translateY(-1px);
-  border-color: rgba(232, 85, 0, 0.68);
-  box-shadow:
-    0 0 0 4px rgba(232, 85, 0, 0.08),
-    0 16px 28px rgba(96, 52, 8, 0.12);
-}
-
-.pin-input-native {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: text;
-}
-
-.login-meta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.login-trust-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--primary-deep);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.login-trust-toggle input {
-  accent-color: #e85500;
-  width: 16px;
-  height: 16px;
-}
-
-.login-retry-note {
-  color: #b45309;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.login-submit:disabled {
-  opacity: 0.76;
-}
-
-.security-card {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 240, 0.96));
-}
-
-.security-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.security-title {
-  margin-bottom: 8px;
-}
-
-.security-copy {
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.9;
-}
-
-.security-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.security-stat {
-  padding: 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(255, 212, 168, 0.7);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
-}
-
-.security-stat span {
-  display: block;
-  margin-bottom: 8px;
-  color: rgba(95, 59, 31, 0.72);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.security-stat strong {
-  display: block;
-  color: var(--primary-deep);
-  font-size: 14px;
-  line-height: 1.8;
-}
-
-.security-form {
-  display: grid;
-  gap: 12px;
-}
-
-.security-form label {
-  color: var(--primary-deep);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.security-form input {
-  margin-top: 8px;
-}
-
-.security-actions {
-  display: flex;
-  justify-content: flex-start;
 }
 
 @keyframes logoFloat {
@@ -1938,25 +1752,6 @@ textarea {
   }
 }
 
-@keyframes pinShake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-8px);
-  }
-  40% {
-    transform: translateX(7px);
-  }
-  60% {
-    transform: translateX(-6px);
-  }
-  80% {
-    transform: translateX(5px);
-  }
-}
-
 @media (max-width: 640px) {
   .header {
     padding: 1.4rem 1rem 4.2rem;
@@ -1967,9 +1762,7 @@ textarea {
   .invoice-head,
   .invoice-toolbar,
   .edit-banner,
-  .today-alert-header,
-  .security-head,
-  .login-field-head {
+  .today-alert-header {
     flex-direction: column;
     align-items: stretch;
   }
@@ -1984,8 +1777,7 @@ textarea {
   .action-row,
   .stats-grid,
   .invoice-grid,
-  .invoice-summary,
-  .security-stats {
+  .invoice-summary {
     grid-template-columns: 1fr;
   }
 
@@ -1999,10 +1791,6 @@ textarea {
   .invoice-page {
     min-height: auto;
     padding: 12px;
-  }
-
-  .pin-slot-group {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .bactions {

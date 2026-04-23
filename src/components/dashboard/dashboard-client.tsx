@@ -12,16 +12,12 @@ import {
 import { useRouter } from "next/navigation";
 
 import { AdminNotificationCard } from "@/components/dashboard/admin-notification-card";
-import { AdminSecurityCard } from "@/components/dashboard/admin-security-card";
 import { BrandHero } from "@/components/shared/brand-hero";
-import { SessionActivityGuard } from "@/components/shared/session-activity-guard";
 import type { DateFilterValue } from "@/lib/bookings/options";
 import { generateBookingPdfFile } from "@/lib/bookings/invoice-pdf.client";
 import { printInvoiceDocument } from "@/lib/bookings/invoice-print.client";
-import { SESSION_IDLE_TIMEOUT_MS } from "@/lib/auth/session";
 import { derivePaymentStatus } from "@/lib/bookings/schema";
 import type { Booking } from "@/types/booking";
-import type { AdminSecuritySnapshot } from "@/types/auth";
 import {
   buildInvoiceNumber,
   formatCurrency,
@@ -51,7 +47,6 @@ type DashboardClientProps = {
   isPushReady: boolean;
   missingPushKeys: string[];
   publicVapidKey: string;
-  initialSecuritySnapshot: AdminSecuritySnapshot;
   loadError?: string | null;
 };
 
@@ -103,7 +98,6 @@ export function DashboardClient({
   isPushReady,
   missingPushKeys,
   publicVapidKey,
-  initialSecuritySnapshot,
   loadError,
 }: DashboardClientProps) {
   const router = useRouter();
@@ -441,8 +435,6 @@ export function DashboardClient({
 
   return (
     <>
-      <SessionActivityGuard timeoutMs={SESSION_IDLE_TIMEOUT_MS} />
-
       <BrandHero
         subtitle="نظام حجوزات الجلسات التصويرية"
         badge="لوحة التحكم"
@@ -463,8 +455,6 @@ export function DashboardClient({
 
       <div className="wrap">
         <TodaySessionsAlert bookings={todayBookings} todayDate={todayDate} />
-
-        <AdminSecurityCard initialSnapshot={initialSecuritySnapshot} />
 
         <AdminNotificationCard
           isPushConfigured={isPushReady}

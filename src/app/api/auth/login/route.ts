@@ -2,11 +2,11 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { attemptAdminLogin } from "@/lib/auth/security";
+import { verifyAdminPin } from "@/lib/auth/pin";
 import {
   createAdminSessionToken,
-  getSessionCookieOptions,
   SESSION_COOKIE_NAME,
+  sessionCookieOptions,
 } from "@/lib/auth/session";
 import { hasAuthConfig } from "@/lib/env";
 
@@ -15,7 +15,6 @@ const loginSchema = z.object({
     .string()
     .trim()
     .regex(/^\d{4,12}$/, "يجب إدخال PIN من 4 إلى 12 رقماً"),
-  rememberDevice: z.boolean().optional().default(true),
 });
 
 export async function POST(request: Request) {
@@ -28,35 +27,21 @@ export async function POST(request: Request) {
     }
 
     const body = loginSchema.parse(await request.json());
-    const loginResult = await attemptAdminLogin(body.pin);
+    const isValidPin = await verifyAdminPin(body.pin);
 
-    if (!loginResult.ok) {
+    if (!isValidPin) {
       return NextResponse.json(
-        {
-          message: loginResult.message,
-          retryAfterMs: loginResult.retryAfterMs,
-          snapshot: loginResult.snapshot,
-        },
-        { status: loginResult.status },
+        { message: "PIN غير صحيح. حاول مرة أخرى." },
+        { status: 401 },
       );
     }
 
-    const sessionToken = await createAdminSessionToken({
-      rememberDevice: body.rememberDevice,
-    });
+    const sessionToken = await createAdminSessionToken();
     const cookieStore = await cookies();
 
-    cookieStore.set(
-      SESSION_COOKIE_NAME,
-      sessionToken,
-      getSessionCookieOptions(body.rememberDevice),
-    );
+    cookieStore.set(SESSION_COOKIE_NAME, sessionToken, sessionCookieOptions);
 
-    return NextResponse.json({
-      ok: true,
-      message: "تم تسجيل الدخول بنجاح.",
-      snapshot: loginResult.snapshot,
-    });
+    return NextResponse.json({ ok: true });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
