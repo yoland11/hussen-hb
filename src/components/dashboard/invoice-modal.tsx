@@ -15,6 +15,7 @@ type InvoiceModalProps = {
   onClose: () => void;
   onPrint: () => void;
   onShare: () => void;
+  onDownloadPdf: () => void;
 };
 
 function InvoiceBody({ booking }: { booking: Booking }) {
@@ -128,6 +129,7 @@ export function InvoiceModal({
   onClose,
   onPrint,
   onShare,
+  onDownloadPdf,
 }: InvoiceModalProps) {
   if (!booking) {
     return null;
@@ -149,6 +151,15 @@ export function InvoiceModal({
             <button className="ibtn share" type="button" onClick={onShare}>
               مشاركة
             </button>
+            {booking.invoice_pdf_path ? (
+              <button
+                className="ibtn preview"
+                type="button"
+                onClick={onDownloadPdf}
+              >
+                تحميل المحفوظ
+              </button>
+            ) : null}
             <button className="ibtn print" type="button" onClick={onPrint}>
               طباعة PDF
             </button>

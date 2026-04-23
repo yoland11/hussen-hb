@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#166534</color>
+    <color name="colorPrimaryDark">#123524</color>
+    <color name="colorAccent">#22C55E</color>
+    <color name="intro_background_deep">#050505</color>
+    <color name="intro_background_secondary">#0F1E19</color>
+    <color name="intro_glass_fill">#1CFFFFFF</color>
+    <color name="intro_glass_border">#42FFFFFF</color>
+    <color name="intro_glass_shine">#24FFF8E0</color>
+    <color name="intro_gold">#F6D56C</color>
+    <color name="intro_green">#22C55E</color>
+    <color name="intro_text_primary">#F8F8F6</color>
+    <color name="intro_text_secondary">#C9D6CF</color>
+</resources>

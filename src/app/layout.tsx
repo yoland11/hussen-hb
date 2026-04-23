@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import type { Viewport } from "next";
 import { IBM_Plex_Sans_Arabic, Noto_Kufi_Arabic } from "next/font/google";
 import type { ReactNode } from "react";
+
+import { AppIntroSplash } from "@/components/shared/app-intro-splash";
+import { PwaBootstrap } from "@/components/shared/pwa-bootstrap";
 
 import "./globals.css";
 
@@ -20,6 +24,16 @@ export const metadata: Metadata = {
   title: "حسين بيرام | نظام إدارة الحجوزات",
   description:
     "نظام إدارة حجوزات جلسات تصوير أونلاين مبني باستخدام Next.js وSupabase وVercel.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "حسين بيرام",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#003049",
 };
 
 export default function RootLayout({
@@ -33,7 +47,11 @@ export default function RootLayout({
       dir="rtl"
       className={`${bodyFont.variable} ${displayFont.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <PwaBootstrap />
+        <AppIntroSplash />
+        {children}
+      </body>
     </html>
   );
 }

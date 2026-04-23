@@ -14,6 +14,8 @@ export interface Booking {
   paid_amount: number;
   payment_status: PaymentStatus;
   notes: string;
+  invoice_pdf_path?: string | null;
+  invoice_pdf_updated_at?: string | null;
   created_at: string;
   updated_at: string;
 }

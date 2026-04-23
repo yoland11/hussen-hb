@@ -15,6 +15,7 @@ type BookingListProps = {
   onPreview: (booking: Booking) => void;
   onPrint: (booking: Booking) => void;
   onShare: (booking: Booking) => void;
+  onDownloadPdf: (booking: Booking) => void;
 };
 
 export function BookingList({
@@ -25,6 +26,7 @@ export function BookingList({
   onPreview,
   onPrint,
   onShare,
+  onDownloadPdf,
 }: BookingListProps) {
   if (!bookings.length) {
     return (
@@ -120,6 +122,15 @@ export function BookingList({
                 >
                   طباعة PDF
                 </button>
+                {booking.invoice_pdf_path ? (
+                  <button
+                    className="mini-btn preview"
+                    type="button"
+                    onClick={() => onDownloadPdf(booking)}
+                  >
+                    تحميل PDF
+                  </button>
+                ) : null}
               </div>
 
               <button

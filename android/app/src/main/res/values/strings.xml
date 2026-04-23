@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">حسين بيرام</string>
+    <string name="title_activity_main">حسين بيرام</string>
+    <string name="package_name">com.husseinbairam.bookings</string>
+    <string name="custom_url_scheme">com.husseinbairam.bookings</string>
+    <string name="intro_subtitle">نظام إدارة حجوزات جلسات التصوير</string>
+</resources>

@@ -23,6 +23,11 @@
 # misc
 .DS_Store
 *.pem
+.gradle/
+android/.gradle/
+android/local.properties
+android/app/build/
+android/build/
 
 # debug
 npm-debug.log*

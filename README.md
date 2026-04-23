@@ -57,6 +57,28 @@ npm run dev
 3. نفّذ `schema.sql` في Supabase.
 4. انشر المشروع.
 
+## نسخة Android APK
+
+- تم تجهيز المشروع كـ Android wrapper باستخدام Capacitor.
+- التطبيق يعتمد على النسخة المنشورة أونلاين من النظام:
+  `https://hussein-bairam.vercel.app`
+- ملف الـ APK الجاهز للتثبيت يوجد هنا:
+  [releases/hussein-bairam-debug.apk](/Users/yoland/Desktop/حسين بيرام /releases/hussein-bairam-debug.apk)
+
+### إعادة بناء الـ APK محلياً
+
+بعد تثبيت JDK وAndroid SDK، نفّذ:
+
+```bash
+./scripts/build-android-apk.sh
+```
+
+وسيتم إنشاء النسخة القابلة للتثبيت داخل:
+
+```bash
+android/app/build/outputs/apk/debug/app-debug.apk
+```
+
 ## هيكل المشروع
 
 - `src/app` صفحات Next.js وواجهات الـ API
@@ -65,3 +87,6 @@ npm run dev
 - `schema.sql` إنشاء جدول الحجوزات
 - `env.example` قالب البيئة
 - `scripts/hash-pin.mjs` توليد hash للـ PIN
+- `capacitor.config.ts` إعدادات ربط نسخة Android بالموقع المنشور
+- `scripts/build-android-apk.sh` سكربت بناء الـ APK
+- `android` مشروع Android الأصلي

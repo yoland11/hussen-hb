@@ -1,7 +1,11 @@
 import { DashboardClient } from "@/components/dashboard/dashboard-client";
 import { redirectIfUnauthenticated } from "@/lib/auth/guards";
 import { listBookings } from "@/lib/bookings/service";
-import { getServerEnvState, hasSupabaseConfig } from "@/lib/env";
+import {
+  getServerEnvState,
+  hasPushConfig,
+  hasSupabaseConfig,
+} from "@/lib/env";
 import type { Booking } from "@/types/booking";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +15,7 @@ export default async function DashboardPage() {
 
   const envState = getServerEnvState();
   const supabaseReady = hasSupabaseConfig();
+  const pushReady = hasPushConfig();
 
   let initialBookings: Booking[] = [];
   let loadError: string | null = null;
@@ -32,6 +37,9 @@ export default async function DashboardPage() {
         initialBookings={initialBookings}
         isSupabaseReady={supabaseReady}
         missingSupabaseKeys={envState.missingSupabaseKeys}
+        isPushReady={pushReady}
+        missingPushKeys={envState.missingPushKeys}
+        publicVapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
         loadError={loadError}
       />
     </main>

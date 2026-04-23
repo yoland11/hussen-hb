@@ -15,6 +15,21 @@ create table if not exists public.bookings (
   payment_status text not null default 'unpaid'
     check (payment_status in ('paid', 'partial', 'unpaid')),
   notes text not null default '',
+  invoice_pdf_path text,
+  invoice_pdf_updated_at timestamptz,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+alter table public.bookings add column if not exists invoice_pdf_path text;
+alter table public.bookings add column if not exists invoice_pdf_updated_at timestamptz;
+
+create table if not exists public.notification_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  endpoint text not null unique,
+  keys_p256dh text not null,
+  keys_auth text not null,
+  user_agent text not null default '',
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
@@ -36,6 +51,19 @@ before update on public.bookings
 for each row
 execute function public.set_timestamp_updated_at();
 
+drop trigger if exists notification_subscriptions_set_updated_at on public.notification_subscriptions;
+
+create trigger notification_subscriptions_set_updated_at
+before update on public.notification_subscriptions
+for each row
+execute function public.set_timestamp_updated_at();
+
 create index if not exists bookings_booking_date_idx on public.bookings (booking_date);
 create index if not exists bookings_created_at_idx on public.bookings (created_at desc);
 create index if not exists bookings_phone_idx on public.bookings (phone);
+create index if not exists notification_subscriptions_endpoint_idx
+  on public.notification_subscriptions (endpoint);
+
+insert into storage.buckets (id, name, public)
+values ('booking-files', 'booking-files', false)
+on conflict (id) do nothing;
