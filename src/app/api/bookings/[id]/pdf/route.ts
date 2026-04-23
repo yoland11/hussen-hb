@@ -6,7 +6,10 @@ import {
   getBookingById,
   saveBookingPdfPath,
 } from "@/lib/bookings/service";
-import { buildBookingPdfPath } from "@/lib/bookings/pdf-path";
+import {
+  buildBookingPdfFileName,
+  buildBookingPdfPath,
+} from "@/lib/bookings/pdf-path";
 import { ensureBookingsBucket, getBookingsBucket } from "@/lib/bookings/pdf-storage";
 import { hasSupabaseConfig } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
@@ -119,7 +122,7 @@ export async function GET(_request: Request, context: RouteContext) {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(
-          booking.invoice_pdf_path.split("/").pop() || `${booking.customer_name}.pdf`,
+          buildBookingPdfFileName(booking),
         )}`,
       },
     });
