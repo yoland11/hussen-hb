@@ -21,6 +21,23 @@ export function formatDateLabel(value: string) {
   return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
 }
 
+export function formatDateTimeLabel(value: string | null | undefined) {
+  if (!value) {
+    return "لا يوجد بعد";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("ar-IQ", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(date);
+}
+
 export function buildInvoiceNumber(booking: Pick<Booking, "id">) {
   const seed = booking.id.replaceAll("-", "").slice(-6).toUpperCase();
   return `HB-${seed}`;

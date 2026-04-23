@@ -34,6 +34,19 @@ create table if not exists public.notification_subscriptions (
   updated_at timestamptz not null default timezone('utc', now())
 );
 
+create table if not exists public.admin_security_settings (
+  key text primary key,
+  pin_hash text,
+  consecutive_failed_attempts integer not null default 0,
+  failed_attempts_total integer not null default 0,
+  last_failed_at timestamptz,
+  last_login_at timestamptz,
+  locked_until timestamptz,
+  retry_after_until timestamptz,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
 create or replace function public.set_timestamp_updated_at()
 returns trigger
 language plpgsql
@@ -58,12 +71,25 @@ before update on public.notification_subscriptions
 for each row
 execute function public.set_timestamp_updated_at();
 
+drop trigger if exists admin_security_settings_set_updated_at on public.admin_security_settings;
+
+create trigger admin_security_settings_set_updated_at
+before update on public.admin_security_settings
+for each row
+execute function public.set_timestamp_updated_at();
+
 create index if not exists bookings_booking_date_idx on public.bookings (booking_date);
 create index if not exists bookings_created_at_idx on public.bookings (created_at desc);
 create index if not exists bookings_phone_idx on public.bookings (phone);
 create index if not exists notification_subscriptions_endpoint_idx
   on public.notification_subscriptions (endpoint);
+create index if not exists admin_security_settings_locked_until_idx
+  on public.admin_security_settings (locked_until);
 
 insert into storage.buckets (id, name, public)
 values ('booking-files', 'booking-files', false)
 on conflict (id) do nothing;
+
+insert into public.admin_security_settings (key, pin_hash)
+values ('primary', null)
+on conflict (key) do nothing;

@@ -1,16 +1,15 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { SESSION_COOKIE_NAME, sessionCookieOptions } from "@/lib/auth/session";
+import {
+  getExpiredSessionCookieOptions,
+  SESSION_COOKIE_NAME,
+} from "@/lib/auth/session";
 
 export async function POST() {
   const cookieStore = await cookies();
 
-  cookieStore.set(SESSION_COOKIE_NAME, "", {
-    ...sessionCookieOptions,
-    expires: new Date(0),
-    maxAge: 0,
-  });
+  cookieStore.set(SESSION_COOKIE_NAME, "", getExpiredSessionCookieOptions());
 
   return NextResponse.json({ ok: true });
 }
