@@ -15,7 +15,7 @@ import { AdminNotificationCard } from "@/components/dashboard/admin-notification
 import { BrandHero } from "@/components/shared/brand-hero";
 import type { DateFilterValue } from "@/lib/bookings/options";
 import { generateBookingPdfFile } from "@/lib/bookings/invoice-pdf.client";
-import { renderInvoiceDocument } from "@/lib/bookings/invoice";
+import { printInvoiceDocument } from "@/lib/bookings/invoice-print.client";
 import { derivePaymentStatus } from "@/lib/bookings/schema";
 import type { Booking } from "@/types/booking";
 import {
@@ -272,18 +272,13 @@ export function DashboardClient({
       return;
     }
 
-    const printWindow = window.open("", "_blank", "noopener,noreferrer");
-
-    if (!printWindow) {
-      setFormError("تعذر فتح نافذة الطباعة. تأكد من السماح بالنوافذ المنبثقة.");
-      return;
-    }
-
-    printWindow.document.open();
-    printWindow.document.write(renderInvoiceDocument(booking));
-    printWindow.document.close();
-    printWindow.focus();
-    window.setTimeout(() => printWindow.print(), 300);
+    void printInvoiceDocument(booking).catch((error: unknown) => {
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : "تعذر فتح نافذة الطباعة حالياً.",
+      );
+    });
   }
 
   async function shareInvoice(source?: Booking) {
