@@ -678,6 +678,39 @@ textarea {
 
 .notification-card {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 248, 239, 0.94));
+  max-height: 320px;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    max-height 0.28s ease,
+    margin-bottom 0.28s ease,
+    padding-top 0.28s ease,
+    padding-bottom 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+  will-change: opacity, transform, max-height;
+}
+
+.notification-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notification-card.is-leaving {
+  opacity: 0;
+  transform: translateY(-10px);
+  max-height: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.notification-card.is-leaving::before {
+  opacity: 0;
 }
 
 .notification-copy {
@@ -710,6 +743,59 @@ textarea {
 .notification-status.enabled {
   background: rgba(22, 163, 74, 0.14);
   color: #166534;
+}
+
+.notification-mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(236, 253, 243, 0.98), rgba(243, 255, 248, 0.96));
+  border: 1px solid rgba(34, 197, 94, 0.18);
+  box-shadow: 0 10px 24px rgba(22, 101, 52, 0.08);
+  animation: cardAppear 0.28s ease both;
+}
+
+.notification-mini-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.notification-mini-status::before {
+  content: "🔔";
+}
+
+.notification-mini-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 9px 14px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #166534;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(22, 101, 52, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notification-mini-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(22, 101, 52, 0.12);
+}
+
+.notification-mini-btn:disabled {
+  opacity: 0.72;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
 }
 
 .edit-banner {

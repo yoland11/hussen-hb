@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { urlBase64ToUint8Array } from "@/lib/pwa/vapid";
 
@@ -18,6 +18,8 @@ type NotificationState =
   | "disabled"
   | "enabled";
 
+const CARD_HIDE_DURATION_MS = 280;
+
 async function getPushSubscription() {
   const registration = await navigator.serviceWorker.ready;
   return registration.pushManager.getSubscription();
@@ -31,6 +33,11 @@ export function AdminNotificationCard({
   const [status, setStatus] = useState<NotificationState>("loading");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<"enable" | "disable" | null>(null);
+  const [hasResolvedSubscription, setHasResolvedSubscription] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const hideTimeoutRef = useRef<number | null>(null);
 
   const isSupported = useMemo(
     () =>
@@ -46,36 +53,100 @@ export function AdminNotificationCard({
       ? "unavailable"
       : status;
 
+  const clearHideTimeout = useCallback(() => {
+    if (hideTimeoutRef.current !== null) {
+      window.clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  }, []);
+
+  const revealCard = useCallback((nextStatus: NotificationState) => {
+    clearHideTimeout();
+    setIsLeaving(false);
+    setIsVisible(true);
+    setStatus(nextStatus);
+  }, [clearHideTimeout]);
+
+  const hideCard = useCallback((
+    nextStatus: NotificationState,
+    animate: boolean,
+  ) => {
+    clearHideTimeout();
+    setStatus(nextStatus);
+
+    if (!animate) {
+      setIsLeaving(false);
+      setIsVisible(false);
+      return;
+    }
+
+    setIsLeaving(true);
+    hideTimeoutRef.current = window.setTimeout(() => {
+      setIsVisible(false);
+      setIsLeaving(false);
+      hideTimeoutRef.current = null;
+    }, CARD_HIDE_DURATION_MS);
+  }, [clearHideTimeout]);
+
+  const applySubscriptionState = useCallback((
+    subscription: PushSubscription | null,
+    options?: { animateHide?: boolean },
+  ) => {
+    const hasSubscription = Boolean(subscription);
+
+    setHasResolvedSubscription(true);
+    setIsSubscribed(hasSubscription);
+
+    if (Notification.permission === "denied") {
+      revealCard("blocked");
+      return;
+    }
+
+    if (hasSubscription) {
+      hideCard("enabled", options?.animateHide ?? false);
+      return;
+    }
+
+    revealCard("disabled");
+  }, [hideCard, revealCard]);
+
   useEffect(() => {
     if (!isSupported || !isPushConfigured || !publicVapidKey) {
       return;
     }
 
     let isMounted = true;
+    const syncSubscriptionState = () => {
+      void getPushSubscription()
+        .then((subscription) => {
+          if (isMounted) {
+            applySubscriptionState(subscription);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            applySubscriptionState(null);
+          }
+        });
+    };
 
-    void getPushSubscription()
-      .then((subscription) => {
-        if (!isMounted) {
-          return;
-        }
-
-        if (Notification.permission === "denied") {
-          setStatus("blocked");
-          return;
-        }
-
-        setStatus(subscription ? "enabled" : "disabled");
-      })
-      .catch(() => {
-        if (isMounted) {
-          setStatus("disabled");
-        }
-      });
+    syncSubscriptionState();
+    window.addEventListener("focus", syncSubscriptionState);
+    document.addEventListener("visibilitychange", syncSubscriptionState);
 
     return () => {
       isMounted = false;
+      clearHideTimeout();
+      window.removeEventListener("focus", syncSubscriptionState);
+      document.removeEventListener("visibilitychange", syncSubscriptionState);
     };
-  }, [isPushConfigured, isSupported, publicVapidKey]);
+  }, [
+    applySubscriptionState,
+    clearHideTimeout,
+    isPushConfigured,
+    isSupported,
+    publicVapidKey,
+  ]);
 
   async function enableNotifications() {
     try {
@@ -115,14 +186,14 @@ export function AdminNotificationCard({
         throw new Error(result.message ?? "تعذر تفعيل الإشعارات.");
       }
 
-      setStatus("enabled");
+      applySubscriptionState(subscription, { animateHide: true });
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
           : "تعذر تفعيل الإشعارات حالياً.",
       );
-      setStatus("disabled");
+      applySubscriptionState(null);
     } finally {
       setBusy(null);
     }
@@ -149,7 +220,7 @@ export function AdminNotificationCard({
         await subscription.unsubscribe();
       }
 
-      setStatus("disabled");
+      applySubscriptionState(null);
     } catch {
       setError("تعذر إيقاف الإشعارات حالياً.");
     } finally {
@@ -157,8 +228,53 @@ export function AdminNotificationCard({
     }
   }
 
+  const shouldRenderCard =
+    !isSupported ||
+    !isPushConfigured ||
+    !publicVapidKey ||
+    !hasResolvedSubscription ||
+    isVisible ||
+    isLeaving ||
+    !isSubscribed;
+  const showCompactManager =
+    isSupported &&
+    isPushConfigured &&
+    Boolean(publicVapidKey) &&
+    hasResolvedSubscription &&
+    isSubscribed &&
+    !isVisible &&
+    !isLeaving;
+
+  if (
+    isSupported &&
+    isPushConfigured &&
+    publicVapidKey &&
+    !hasResolvedSubscription
+  ) {
+    return null;
+  }
+
+  if (!shouldRenderCard) {
+    return showCompactManager ? (
+      <div className="notification-mini">
+        <span className="notification-mini-status">الإشعارات مفعلة</span>
+        <button
+          className="notification-mini-btn"
+          type="button"
+          onClick={() => void disableNotifications()}
+          disabled={busy === "disable"}
+        >
+          {busy === "disable" ? "جارٍ الإيقاف..." : "إلغاء التفعيل"}
+        </button>
+      </div>
+    ) : null;
+  }
+
   return (
-    <section className="card notification-card">
+    <section
+      className={`card notification-card ${isLeaving ? "is-leaving" : "is-visible"}`.trim()}
+      aria-hidden={isLeaving ? "true" : undefined}
+    >
       <div className="ctitle">
         <span className="cicon">🔔</span>
         <span>إشعارات الإدارة</span>
