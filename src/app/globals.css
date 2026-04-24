@@ -152,21 +152,30 @@ a {
   position: relative;
 }
 
-.genie-scroll-stage {
-  position: relative;
-  isolation: isolate;
-}
-
-.genie-scroll-stage__inner {
-  position: relative;
-  transform-origin: 50% 50%;
-  will-change: transform, clip-path;
-  backface-visibility: hidden;
-}
-
 .scroll-reveal {
-  transform-origin: 50% 50%;
-  backface-visibility: hidden;
+  --reveal-delay: 0ms;
+  --reveal-offset-x: 0px;
+  --reveal-offset-y: 28px;
+}
+
+.scroll-reveal.is-ready {
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay),
+    filter 0.72s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay);
+  will-change: opacity, transform, filter;
+}
+
+.scroll-reveal.is-ready.is-hidden {
+  opacity: 0;
+  transform: translate3d(var(--reveal-offset-x), var(--reveal-offset-y), 0);
+  filter: saturate(0.88);
+}
+
+.scroll-reveal.is-ready.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: saturate(1);
 }
 
 .header {
@@ -1790,12 +1799,6 @@ textarea {
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
-    clip-path: none !important;
-  }
-
-  .genie-scroll-stage__inner {
-    clip-path: none !important;
-    transform: none !important;
   }
 }
 

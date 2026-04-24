@@ -1,28 +1,21 @@
 "use client";
 
 import {
-  motion,
-  useInView,
-  useReducedMotion,
-  type HTMLMotionProps,
-} from "framer-motion";
-import {
   useEffect,
   useMemo,
   useRef,
   useState,
-  type ComponentType,
+  type CSSProperties,
+  type ElementType,
+  type HTMLAttributes,
   type ReactNode,
 } from "react";
 
 type RevealDirection = "up" | "down" | "left" | "right";
 type RevealDistance = "sm" | "md" | "lg";
-type RevealTag = keyof HTMLElementTagNameMap;
-type InViewOptions = NonNullable<Parameters<typeof useInView>[1]>;
-type RevealRootMargin = NonNullable<InViewOptions["margin"]>;
 
 type ScrollRevealProps = {
-  as?: RevealTag;
+  as?: ElementType;
   children: ReactNode;
   className?: string;
   delay?: number;
@@ -30,11 +23,8 @@ type ScrollRevealProps = {
   distance?: RevealDistance;
   once?: boolean;
   threshold?: number;
-  rootMargin?: RevealRootMargin;
-} & Omit<
-  HTMLMotionProps<RevealTag>,
-  "animate" | "as" | "children" | "className" | "initial" | "transition" | "variants"
->;
+  rootMargin?: string;
+} & HTMLAttributes<HTMLElement>;
 
 const DISTANCE_MAP: Record<RevealDistance, number> = {
   sm: 18,
@@ -59,12 +49,6 @@ function getOffset(direction: RevealDirection, distance: RevealDistance) {
 
   return { x: 0, y: value };
 }
-
-const HIDDEN_CLIP_PATH =
-  "polygon(8% 0%, 92% 0%, 100% 30%, 94% 50%, 100% 70%, 92% 100%, 8% 100%, 0% 70%, 6% 50%, 0% 30%)";
-const VISIBLE_CLIP_PATH =
-  "polygon(0% 0%, 100% 0%, 100% 30%, 100% 50%, 100% 70%, 100% 100%, 0% 100%, 0% 70%, 0% 50%, 0% 30%)";
-
 export function ScrollReveal({
   as = "div",
   children,
@@ -75,33 +59,31 @@ export function ScrollReveal({
   once = true,
   threshold = 0.14,
   rootMargin = "0px 0px -10% 0px",
-  style,
   ...rest
 }: ScrollRevealProps) {
   const elementRef = useRef<HTMLElement | null>(null);
-  const reduceMotion = useReducedMotion();
-  const isInView = useInView(elementRef, {
-    once,
-    margin: rootMargin,
-    amount: threshold,
-  });
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const offset = useMemo(() => getOffset(direction, distance), [direction, distance]);
-  const MotionComponent = motion[as as keyof typeof motion] as ComponentType<
-    HTMLMotionProps<RevealTag>
-  >;
+  const Component = as;
 
   useEffect(() => {
     const node = elementRef.current;
 
-    if (!node || typeof window === "undefined" || reduceMotion) {
+    if (!node || typeof window === "undefined") {
+      return;
+    }
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    if (reducedMotion.matches) {
       return;
     }
 
     const viewportHeight =
       window.innerHeight || document.documentElement.clientHeight;
     const rect = node.getBoundingClientRect();
-    const isInitiallyVisible = rect.top <= viewportHeight * 0.92 && rect.bottom >= 0;
+    const isInitiallyVisible = rect.top <= viewportHeight * 0.92;
 
     if (isInitiallyVisible) {
       return;
@@ -109,52 +91,56 @@ export function ScrollReveal({
 
     const frameId = window.requestAnimationFrame(() => {
       setShouldAnimate(true);
+      setIsVisible(false);
     });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+
+        if (!entry) {
+          return;
+        }
+
+        window.requestAnimationFrame(() => {
+          setShouldAnimate(true);
+          setIsVisible(entry.isIntersecting);
+        });
+
+        if (entry.isIntersecting && once) {
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold,
+        rootMargin,
+      },
+    );
+
+    observer.observe(node);
 
     return () => {
       window.cancelAnimationFrame(frameId);
+      observer.disconnect();
     };
-  }, [reduceMotion]);
-  const animationState =
-    reduceMotion || !shouldAnimate || isInView ? "visible" : "hidden";
+  }, [once, rootMargin, threshold]);
+
+  const style = {
+    "--reveal-delay": `${delay}ms`,
+    "--reveal-offset-x": `${offset.x}px`,
+    "--reveal-offset-y": `${offset.y}px`,
+  } as CSSProperties;
 
   return (
-    <MotionComponent
+    <Component
       ref={elementRef}
-      initial={false}
-      animate={reduceMotion ? "visible" : animationState}
-      variants={{
-        hidden: {
-          opacity: 0,
-          x: offset.x,
-          y: offset.y,
-          scaleX: 0.984,
-          scaleY: 0.962,
-          clipPath: HIDDEN_CLIP_PATH,
-        },
-        visible: {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          scaleX: 1,
-          scaleY: 1,
-          clipPath: VISIBLE_CLIP_PATH,
-        },
-      }}
-      transition={{
-        duration: 0.86,
-        delay: delay / 1000,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className={`scroll-reveal ${className}`.trim()}
-      style={{
-        ...style,
-        transformOrigin: "50% 50%",
-        willChange: "transform, opacity, clip-path",
-      }}
+      className={`scroll-reveal ${shouldAnimate ? "is-ready" : ""} ${
+        isVisible ? "is-visible" : "is-hidden"
+      } ${className}`.trim()}
+      style={style}
       {...rest}
     >
       {children}
-    </MotionComponent>
+    </Component>
   );
 }
