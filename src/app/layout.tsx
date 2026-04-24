@@ -4,6 +4,7 @@ import { IBM_Plex_Sans_Arabic, Noto_Kufi_Arabic } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { AppIntroSplash } from "@/components/shared/app-intro-splash";
+import { GenieScrollStage } from "@/components/shared/genie-scroll-stage";
 import { PwaBootstrap } from "@/components/shared/pwa-bootstrap";
 
 import "./globals.css";
@@ -50,7 +51,7 @@ export default function RootLayout({
       <body>
         <PwaBootstrap />
         <AppIntroSplash />
-        {children}
+        <GenieScrollStage>{children}</GenieScrollStage>
       </body>
     </html>
   );
