@@ -71,7 +71,7 @@ export function BookingForm({
 
   return (
     <form onSubmit={onSubmit}>
-      <SectionCard icon="👤" title="بيانات العميل">
+      <SectionCard icon="👤" title="بيانات العميل" revealDelay={40}>
         <div className="two">
           <div className="fld">
             <label htmlFor="customer_name">اسم العميل</label>
@@ -111,7 +111,7 @@ export function BookingForm({
         </div>
       </SectionCard>
 
-      <SectionCard icon="🎭" title="نوع الجلسة">
+      <SectionCard icon="🎭" title="نوع الجلسة" revealDelay={90}>
         <div className="fld">
           <label>التفاصيل</label>
           <div className="opts">
@@ -173,7 +173,7 @@ export function BookingForm({
         </div>
       </SectionCard>
 
-      <SectionCard icon="📍" title="موقع الجلسة">
+      <SectionCard icon="📍" title="موقع الجلسة" revealDelay={130}>
         <div className="opts">
           {locationTypeOptions.map((option) => (
             <OptionButton
@@ -191,7 +191,7 @@ export function BookingForm({
         </div>
       </SectionCard>
 
-      <SectionCard icon="👥" title="الكادر">
+      <SectionCard icon="👥" title="الكادر" revealDelay={170}>
         <div className="opts">
           {staffGenderOptions.map((option) => (
             <OptionButton
@@ -209,7 +209,7 @@ export function BookingForm({
         </div>
       </SectionCard>
 
-      <SectionCard icon="💰" title="الحساب">
+      <SectionCard icon="💰" title="الحساب" revealDelay={210}>
         <div className="two">
           <div className="fld">
             <label htmlFor="total_amount">إجمالي الحساب</label>

@@ -1,4 +1,5 @@
 import { dateFilterOptions, type DateFilterValue } from "@/lib/bookings/options";
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
 
 type BookingFiltersProps = {
   search: string;
@@ -16,7 +17,7 @@ export function BookingFilters({
   onClear,
 }: BookingFiltersProps) {
   return (
-    <section className="card">
+    <ScrollReveal as="section" className="card" delay={90}>
       <div className="ctitle">
         <div className="cicon">🔎</div>
         بحث وفلترة
@@ -55,6 +56,6 @@ export function BookingFilters({
           مسح الفلترة
         </button>
       </div>
-    </section>
+    </ScrollReveal>
   );
 }

@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/login/login-form";
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { BrandHero } from "@/components/shared/brand-hero";
 import { redirectIfAuthenticated } from "@/lib/auth/guards";
 import { hasAuthConfig } from "@/lib/env";
@@ -10,14 +11,16 @@ export default async function LoginPage() {
 
   return (
     <main className="app-shell">
-      <BrandHero
-        subtitle="تسجيل دخول الإدارة"
-        badge="PIN محمي"
-      />
+      <ScrollReveal as="div" delay={20} distance="sm">
+        <BrandHero
+          subtitle="تسجيل دخول الإدارة"
+          badge="PIN محمي"
+        />
+      </ScrollReveal>
 
-      <div className="wrap login-wrap">
+      <ScrollReveal as="div" className="wrap login-wrap" delay={100}>
         <LoginForm authReady={hasAuthConfig()} />
-      </div>
+      </ScrollReveal>
     </main>
   );
 }

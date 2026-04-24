@@ -1,5 +1,6 @@
 import type { Booking } from "@/types/booking";
 
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { formatDateLabel } from "@/lib/utils";
 
 type TodaySessionsAlertProps = {
@@ -18,7 +19,13 @@ export function TodaySessionsAlert({
   const hasMultipleSessions = bookings.length > 1;
 
   return (
-    <section className="today-alert" aria-live="polite">
+    <ScrollReveal
+      as="section"
+      className="today-alert"
+      aria-live="polite"
+      delay={30}
+      distance="sm"
+    >
       <div className="today-alert-header">
         <div className="today-alert-icon" aria-hidden="true">
           📅
@@ -57,6 +64,6 @@ export function TodaySessionsAlert({
           </article>
         ))}
       </div>
-    </section>
+    </ScrollReveal>
   );
 }

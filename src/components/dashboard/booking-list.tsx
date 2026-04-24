@@ -1,5 +1,6 @@
 import type { Booking } from "@/types/booking";
 
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import {
   formatCurrency,
   getPaymentStatusLabel,
@@ -40,14 +41,17 @@ export function BookingList({
     <>
       <div className="blist-title">📋 قائمة الحجوزات</div>
       <div id="blist">
-        {bookings.map((booking) => {
+        {bookings.map((booking, index) => {
           const remainingAmount = getRemainingAmount(booking);
           const todayBooking = isToday(booking.booking_date, todayDate);
 
           return (
-            <article
+            <ScrollReveal
+              as="article"
               className={`bcard ${todayBooking ? "today" : ""}`.trim()}
               key={booking.id}
+              delay={Math.min(index * 45, 240)}
+              distance="sm"
             >
               {todayBooking ? <div className="today-badge">📅 موعد اليوم!</div> : null}
 
@@ -141,7 +145,7 @@ export function BookingList({
               >
                 🗑️
               </button>
-            </article>
+            </ScrollReveal>
           );
         })}
       </div>

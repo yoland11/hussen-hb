@@ -1,10 +1,13 @@
 import type { ReactNode } from "react";
 
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
+
 type SectionCardProps = {
   title: string;
   icon: string;
   children: ReactNode;
   className?: string;
+  revealDelay?: number;
 };
 
 export function SectionCard({
@@ -12,14 +15,19 @@ export function SectionCard({
   icon,
   children,
   className = "",
+  revealDelay = 0,
 }: SectionCardProps) {
   return (
-    <section className={`card ${className}`.trim()}>
+    <ScrollReveal
+      as="section"
+      className={`card ${className}`.trim()}
+      delay={revealDelay}
+    >
       <div className="ctitle">
         <div className="cicon">{icon}</div>
         {title}
       </div>
       {children}
-    </section>
+    </ScrollReveal>
   );
 }

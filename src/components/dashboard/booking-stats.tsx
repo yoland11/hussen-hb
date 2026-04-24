@@ -1,5 +1,6 @@
 import type { Booking } from "@/types/booking";
 
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { formatCurrency, getRemainingAmount, isToday } from "@/lib/utils";
 
 export function BookingStats({
@@ -26,7 +27,7 @@ export function BookingStats({
   );
 
   return (
-    <section className="card">
+    <ScrollReveal as="section" className="card" delay={120}>
       <div className="ctitle">
         <div className="cicon">📊</div>
         إحصائيات سريعة
@@ -50,6 +51,6 @@ export function BookingStats({
           <strong>{formatCurrency(totalRemaining)}</strong>
         </div>
       </div>
-    </section>
+    </ScrollReveal>
   );
 }

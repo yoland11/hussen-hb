@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 
 import { AdminNotificationCard } from "@/components/dashboard/admin-notification-card";
 import { BrandHero } from "@/components/shared/brand-hero";
+import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import type { DateFilterValue } from "@/lib/bookings/options";
 import { generateBookingPdfFile } from "@/lib/bookings/invoice-pdf.client";
 import { printInvoiceDocument } from "@/lib/bookings/invoice-print.client";
@@ -456,11 +457,13 @@ export function DashboardClient({
       <div className="wrap">
         <TodaySessionsAlert bookings={todayBookings} todayDate={todayDate} />
 
-        <AdminNotificationCard
-          isPushConfigured={isPushReady}
-          missingPushKeys={missingPushKeys}
-          publicVapidKey={publicVapidKey}
-        />
+        <ScrollReveal as="div" delay={60} distance="sm">
+          <AdminNotificationCard
+            isPushConfigured={isPushReady}
+            missingPushKeys={missingPushKeys}
+            publicVapidKey={publicVapidKey}
+          />
+        </ScrollReveal>
 
         {actionMessage ? (
           <div className="notif show success">
